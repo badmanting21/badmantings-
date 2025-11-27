@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Badmantings Clicker</title>
+
+  <!-- Graffiti-style fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+
+  <style>
+    /* Power Clicker styles */
+    #powerClickerBtn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 20;
+      background: #00ffea;
+      color: #222;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      transition: background 0.2s;
+    }
+    #powerClickerBtn:active {
+      background: #9b00ff;
+      color: #fff;
+    }
+    #powerClickerContainer {
+      position: fixed;
+      top: 80px;
+      left: 20px;
+      width: 180px;
+      background: rgba(20, 30, 40, 0.95);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      padding: 18px 12px;
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 80vh;
+      overflow-y: auto;
+      color: #e6eef8;
+      scrollbar-width: thin;
+      scrollbar-color: #00ffea rgba(20, 30, 40, 0.5);
+    }
+    .powerBtn {
+      width: 100%;
+      padding: 8px 0;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(90deg,#ff005c,#9b00ff);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      transition: background 0.2s;
+    }
+    .powerBtn:active {
+      background: linear-gradient(90deg,#00ffea,#00ff00);
+    }
+    /* Shop styles */
+    #shopContainer {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      width: 320px;
+      background: rgba(20, 30, 40, 0.95);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      padding: 18px;
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      gap: 15px;
+      max-height: 80vh;
+      overflow-y: auto;
+      color: #e6eef8;
+      scrollbar-width: thin;
+      scrollbar-color: #00ffea rgba(20, 30, 40, 0.5);
+    }
+
+    .shop-level {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+
+    .shop-level-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(0, 255, 234, 0.3);
+    }
+
+    .shop-level-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #00ffea;
+    }
+
+    .shop-level-status {
+      font-size: 0.9rem;
+      color: #ffcc00;
+    }
+
+    .shop-level.locked {
+      filter: brightness(0.5);
+      pointer-events: none;
+    }
+
+    .shop-level-requirement {
+      font-size: 0.8rem;
+      color: #ff005c;
+      margin-bottom: 10px;
+    }
+
+    .shop-level-upgrades {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #shopContainer::-webkit-scrollbar {
+      width: 8px;
+    }
+    #shopContainer::-webkit-scrollbar-track {
+      background: rgba(20, 30, 40, 0.5);
+      border-radius: 4px;
+    }
+    #shopContainer::-webkit-scrollbar-thumb {
+      background: #00ffea;
+      border-radius: 4px;
+    }
+    #shopContainer::-webkit-scrollbar-thumb:hover {
+      background: #9b00ff;
+    }
+
+    #shopTitle {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    .upgradeBtn {
+      width: 100%;
+      padding: 8px 0;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(90deg,#00ffea,#9b00ff);
+      color: #222;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      transition: background 0.2s;
+    }
+    .upgradeBtn:active {
+      background: linear-gradient(90deg,#ffcc00,#ff005c);
+    }
+    #shopToggleBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 20;
+      background: #00ffea;
+      color: #222;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      transition: background 0.2s;
+    }
+    #shopToggleBtn:active {
+      background: #9b00ff;
+      color: #fff;
+    }
+    body {
+      background: url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1400&q=80')
+        no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding-top: 20px;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-family: 'Permanent Marker', cursive;
+      font-size: 4rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, #00ffea, #00ff00, #ffcc00, #ff005c, #9b00ff);
+      background-size: 400%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 2px 2px 6px rgba(0,0,0,0.8);
+      margin: 0 0 30px 0;
+      animation: colorShift 5s infinite alternate;
+    }
+
+    @keyframes colorShift {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    #score {
+      font-size: 2.2rem;
+      margin-bottom: 15px;
+      text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+    }
+    
+    #cps {
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+      color: #00ffea;
+    }
+
+    #clickImage {
+      width: 220px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.1s ease;
+      background: none;
+      z-index: 5;
+    }
+
+    #clickImage:active {
+      transform: scale(1.05);
+    }
+
+    .falling-can {
+      position: fixed;
+      width: 40px;
+      height: 80px;
+      pointer-events: none;
+      z-index: 1;
+      animation: fallDown 2s linear;
+      opacity: 0.8;
+    }
+
+    @keyframes fallDown {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0.6;
+      }
+    }
+
+    #nextLevelBtn {
+      display: none;
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 30px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-decoration: none;
+      color: #fff;
+      background: linear-gradient(90deg, #00ffea, #9b00ff);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+      z-index: 100;
+    }
+
+    #nextLevelBtn:hover {
+      transform: translateX(-50%) scale(1.1);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 4px 16px rgba(0,255,234,0.3); }
+      50% { box-shadow: 0 4px 24px rgba(155,0,255,0.5); }
+      100% { box-shadow: 0 4px 16px rgba(0,255,234,0.3); }
+    }
+
+
+
+    @keyframes glow {
+      0% { box-shadow: 0 0 10px rgba(0,255,234,0.3); }
+      50% { box-shadow: 0 0 20px rgba(155,0,255,0.5); }
+      100% { box-shadow: 0 0 10px rgba(0,255,234,0.3); }
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translate(-50%, -20px); }
+      10% { opacity: 1; transform: translate(-50%, 0); }
+      90% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 0; transform: translate(-50%, -20px); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Badmantings</h1>
+  <div id="score">Score: 0</div>
+  <div id="cps">CPS: 0</div>
+  
+  <img id="clickImage" src="level 1.png" alt="Monster Can Clicker" />
+  
+  <!-- Sound effect -->
+  <audio id="slurpSound" preload="auto">
+    <source src="slurp.mp3" type="audio/mpeg">
+  </audio>
+
+  <a href="level2.html" id="nextLevelBtn">Next Level!</a>
+
+  <button id="powerClickerBtn">Power Clickers</button>
+  <div id="powerClickerContainer">
+    <button class="powerBtn" data-multiplier="2" data-cost="150">x2 Power Click - 150</button>
+    <button class="powerBtn" data-multiplier="5" data-cost="500">x5 Power Click - 500</button>
+    <button class="powerBtn" data-multiplier="16" data-cost="2000">x16 Power Click - 2.0K</button>
+    <button class="powerBtn" data-multiplier="25" data-cost="10000">x25 Power Click - 10K</button>
+    <button class="powerBtn" data-multiplier="100" data-cost="50000">x100 Power Click - 50K</button>
+    <button class="powerBtn" data-multiplier="500" data-cost="250000">x500 Power Click - 250K</button>
+    <button class="powerBtn" data-multiplier="2500" data-cost="1000000">x2.5K Power Click - 1M</button>
+    <button class="powerBtn" data-multiplier="10000" data-cost="5000000">x10K Power Click - 5M</button>
+    <button class="powerBtn" data-multiplier="50000" data-cost="25000000">x50K Power Click - 25M</button>
+    <button class="powerBtn" data-multiplier="250000" data-cost="100000000">x250K Power Click - 100M</button>
+    <button class="powerBtn" data-multiplier="1000000" data-cost="500000000">x1M Power Click - 500M</button>
+    <button class="powerBtn" data-multiplier="5000000" data-cost="2500000000">x5M Power Click - 2.5B</button>
+    <button class="powerBtn" data-multiplier="25000000" data-cost="10000000000">x25M Power Click - 10B</button>
+    <button class="powerBtn" data-multiplier="100000000" data-cost="50000000000">x100M Power Click - 50B</button>
+    <button class="powerBtn" data-multiplier="1000000000" data-cost="250000000000">x1B Power Click - 250B</button>
+  </div>
+  
+  <button id="shopToggleBtn">Open Shop</button>
+  <div id="shopContainer">
+    <div id="shopUpgrades">
+      <!-- 15 Ant-Groid upgrades: keep same cost and CPS but labeled as Ant-Groids -->
+      <button class="upgradeBtn" data-cost="25" data-cps="1">Ant-Groid 1 (+1 CPS) - 25</button>
+      <button class="upgradeBtn" data-cost="100" data-cps="2">Ant-Groid 2 (+2 CPS) - 100</button>
+      <button class="upgradeBtn" data-cost="250" data-cps="5">Ant-Groid 3 (+5 CPS) - 250</button>
+
+      <button class="upgradeBtn" data-cost="500" data-cps="10">Ant-Groid 4 (+10 CPS) - 500</button>
+      <button class="upgradeBtn" data-cost="1000" data-cps="20">Ant-Groid 5 (+20 CPS) - 1K</button>
+      <button class="upgradeBtn" data-cost="2500" data-cps="50">Ant-Groid 6 (+50 CPS) - 2.5K</button>
+
+      <button class="upgradeBtn" data-cost="5000" data-cps="100">Ant-Groid 7 (+100 CPS) - 5K</button>
+      <button class="upgradeBtn" data-cost="10000" data-cps="200">Ant-Groid 8 (+200 CPS) - 10K</button>
+      <button class="upgradeBtn" data-cost="25000" data-cps="500">Ant-Groid 9 (+500 CPS) - 25K</button>
+
+      <button class="upgradeBtn" data-cost="50000" data-cps="1000">Ant-Groid 10 (+1K CPS) - 50K</button>
+      <button class="upgradeBtn" data-cost="100000" data-cps="2500">Ant-Groid 11 (+2.5K CPS) - 100K</button>
+      <button class="upgradeBtn" data-cost="250000" data-cps="5000">Ant-Groid 12 (+5K CPS) - 250K</button>
+
+      <button class="upgradeBtn" data-cost="500000" data-cps="10000">Ant-Groid 13 (+10K CPS) - 500K</button>
+      <button class="upgradeBtn" data-cost="1000000" data-cps="25000">Ant-Groid 14 (+25K CPS) - 1M</button>
+      <button class="upgradeBtn" data-cost="2500000" data-cps="100000">Ant-Groid 15 (+100K CPS) - 2.5M</button>
+    </div>
+  </div>
+
+  <script>
+    let score = 0;
+    let cps = 0;
+    let clickPower = 120000
+    const scoreDisplay = document.getElementById('score');
+    const cpsDisplay = document.getElementById('cps');
+    const clickImage = document.getElementById('clickImage');
+    const shopToggleBtn = document.getElementById('shopToggleBtn');
+    const shopContainer = document.getElementById('shopContainer');
+    const shopUpgrades = document.getElementById('shopUpgrades');
+    const powerClickerBtn = document.getElementById('powerClickerBtn');
+    const powerClickerContainer = document.getElementById('powerClickerContainer');
+    const slurpSound = document.getElementById('slurpSound');
+
+    function createFallingCan() {
+      const can = document.createElement('img');
+      can.src = clickImage.src;
+      can.className = 'falling-can';
+      // Random horizontal position
+      can.style.left = Math.random() * (window.innerWidth - 40) + 'px';
+      document.body.appendChild(can);
+      
+      // Remove the can element after animation
+      can.addEventListener('animationend', () => {
+        can.remove();
+      });
+    }
+
+    // Format large numbers
+    function formatNumber(num) {
+      const suffixes = ['', 'K', 'M', 'B', 'T', 'Q', 'Qi', 'Sx', 'Sp', 'O', 'N', 'D'];
+      let suffixIndex = 0;
+      while (num >= 1000 && suffixIndex < suffixes.length - 1) {
+        num /= 1000;
+        suffixIndex++;
+      }
+      return num >= 100 ?
+        Math.floor(num) + suffixes[suffixIndex] :
+        num.toFixed(1).replace(/\.0$/, '') + suffixes[suffixIndex];
+    }
+
+    // Power Clicker functionality
+    const powerButtons = document.querySelectorAll('.powerBtn');
+    powerButtons.forEach(btn => {
+      btn.dataset.owned = '0';
+      btn.addEventListener('click', () => {
+        const cost = parseInt(btn.dataset.cost);
+        const multiplier = parseInt(btn.dataset.multiplier);
+        const owned = parseInt(btn.dataset.owned);
+        if (score >= cost) {
+          score -= cost;
+          clickPower = multiplier;
+          const newCost = Math.floor(cost * 2);
+          btn.dataset.cost = newCost;
+          btn.dataset.owned = (owned + 1).toString();
+          btn.textContent = `x${multiplier} Power Click - ${formatNumber(newCost)}`;
+          scoreDisplay.textContent = `Score: ${formatNumber(score)}`;
+          powerButtons.forEach(b => b.style.opacity = '0.7');
+          btn.style.opacity = '1';
+        }
+      });
+    });
+
+    powerClickerBtn.addEventListener('click', () => {
+      if (powerClickerContainer.style.display === 'none' || powerClickerContainer.style.display === '') {
+        powerClickerContainer.style.display = 'flex';
+        powerClickerBtn.textContent = 'Close Powers';
+      } else {
+        powerClickerContainer.style.display = 'none';
+        powerClickerBtn.textContent = 'Power Clickers';
+      }
+    });
+
+    setInterval(() => {
+      if (cps > 0) {
+        score += cps;
+        scoreDisplay.textContent = `Score: ${formatNumber(score)}`;
+        updateUpgradeButtons();
+      }
+    }, 1000);
+
+    const upgradeButtons = document.querySelectorAll('.upgradeBtn');
+    upgradeButtons.forEach(btn => {
+      btn.dataset.bought = '0';
+      btn.onclick = function() {
+        const cost = parseInt(btn.dataset.cost);
+        const cpsIncrease = parseInt(btn.dataset.cps);
+        const timesBought = parseInt(btn.dataset.bought);
+        if (score >= cost) {
+          score -= cost;
+          cps += cpsIncrease;
+          const newCost = Math.floor(cost * 1.15);
+          btn.dataset.cost = newCost;
+          btn.dataset.bought = (timesBought + 1).toString();
+          btn.textContent = `${btn.textContent.split('(')[0]} (${timesBought + 1}) - ${formatNumber(newCost)}`;
+          scoreDisplay.textContent = `Score: ${formatNumber(score)}`;
+          cpsDisplay.textContent = `CPS: ${formatNumber(cps)}`;
+        }
+      };
+    });
+
+    const nextLevelBtn = document.getElementById('nextLevelBtn');
+    
+    function checkNextLevel(score) {
+      
+      if (score >= 3000000 ) {
+        nextLevelBtn.style.display = 'block';
+      }
+    }
+
+    function updateShopLevels() {
+      const shopLevels = document.querySelectorAll('.shop-level');
+      const levelRequirements = {
+        1: 0,
+        2: 1000,
+        3: 10000,
+        4: 100000,
+        5: 1000000
+      };
+
+      shopLevels.forEach(level => {
+        const levelNum = parseInt(level.dataset.level);
+        const requirement = levelRequirements[levelNum];
+        
+        if (score >= requirement) {
+          level.classList.remove('locked');
+          if (levelNum > 1) {
+            const levelReq = level.querySelector('.shop-level-requirement');
+            if (levelReq) {
+              levelReq.style.color = '#00ffea';
+              levelReq.textContent = 'Level Unlocked!';
+            }
+          }
+        }
+      });
+    }
+
+    function updateUpgradeButtons() {
+      upgradeButtons.forEach(btn => {
+        const cost = parseInt(btn.dataset.cost);
+        btn.disabled = score < cost;
+      });
+      updateShopLevels();
+      checkNextLevel(score);
+    }
+
+    shopToggleBtn.addEventListener('click', () => {
+      if (shopContainer.style.display === 'none' || shopContainer.style.display === '') {
+        shopContainer.style.display = 'flex';
+        shopToggleBtn.textContent = 'Close Shop';
+        updateShopLevels();
+      } else {
+        shopContainer.style.display = 'none';
+        shopToggleBtn.textContent = 'Open Shop';
+      }
+    });
+
+    clickImage.addEventListener('click', () => {
+      score += clickPower;
+      scoreDisplay.textContent = `Score: ${formatNumber(score)}`;
+      updateUpgradeButtons();
+      slurpSound.currentTime = 0;
+      slurpSound.play();
+      
+      // Create multiple falling cans
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => createFallingCan(), i * 100);
+      }
+    });
+  </script>
+</body>
+</html>
